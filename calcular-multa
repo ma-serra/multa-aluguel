@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Multa por Rescisão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .btn-calc {
+            display: inline-block;
+            width: 48%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 1%;
+        }
+
+        .btn-calc:hover {
+            background-color: #555;
+        }
+
+        .aviso {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .aviso img {
+            margin-right: 10px;
+        }
+
+        .resultado {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .explicacao {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Multa por Rescisão</h1>
+        <label for="valorAluguel">Qual o valor atual de seu aluguel?</label>
+        <input type="text" id="valorAluguel" placeholder="Ex: R$ 2.000,00" oninput="formatarValor(this)">
+
+        <label for="prazoContrato">Qual o prazo total do seu contrato?</label>
+        <input type="text" id="prazoContrato" placeholder="Ex: 24 meses">
+
+        <label for="inicioContrato">Qual a data de início do seu contrato?</label>
+        <input type="date" id="inicioContrato">
+
+        <label for="devolucao">Quando pretende devolver as chaves?</label>
+        <input type="date" id="devolucao">
+        <div class="aviso">
+            <img src="triangulo-amarelo.png" alt="Aviso" width="20">
+            <span>Verifique se seu contrato não prevê uma antecedência para comunicação, como 30 ou 60 dias.</span>
+        </div>
+        <div style="text-align: center;">
+            <button class="btn-calc" onclick="voltar()">Voltar</button>
+            <button class="btn-calc" onclick="calcularMulta()">Calcular Multa</button>
+        </div>
+        <div id="resultado" class="resultado"></div>
+    </div>
+    <script>
+        function formatarValor(input) {
+            let value = input.value.replace(/\D/g, "");
+            value = (value / 100).toFixed(2) + "";
+            value = value.replace(".", ",");
+            value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+            input.value = "R$ " + value;
+        }
+
+        function calcularMulta() {
+            const valorAluguel = parseFloat(document.getElementById('valorAluguel').value.replace('R$', '').replace('.', '').replace(',', '.').trim());
+            const prazoContrato = parseInt(document.getElementById('prazoContrato').value);
+            const inicioContrato = new Date(document.getElementById('inicioContrato').value);
+            const devolucao = new Date(document.getElementById('devolucao').value);
+
+            const mesesCumpridos = (devolucao.getFullYear() - inicioContrato.getFullYear()) * 12 + (devolucao.getMonth() - inicioContrato.getMonth());
+            const mesesRestantes = prazoContrato - mesesCumpridos;
+
+            const multaTotal = valorAluguel * 3;
+            const multaProporcional = (multaTotal / prazoContrato) * mesesRestantes;
+
+            const resultado = `A multa por rescisão é de R$ ${multaProporcional.toFixed(2).replace('.', ',')}.`;
+            const explicacao = `<strong>Explicação do cálculo:</strong><br>Considerando ${mesesCumpridos} meses cumpridos e ${mesesRestantes} meses restantes, a multa proporcional foi calculada de acordo com o tempo restante até o fim do contrato.`;
+
+            document.getElementById('resultado').innerHTML = `<p>${resultado}</p><div class="explicacao">${explicacao}</div>`;
+        }
+
+        function voltar() {
+            document.getElementById('valorAluguel').value = '';
+            document.getElementById('prazoContrato').value = '';
+            document.getElementById('inicioContrato').value = '';
+            document.getElementById('devolucao').value = '';
+            document.getElementById('resultado').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
